@@ -1,0 +1,85 @@
+//#Checar Herança#
+{
+    Escopo aux1 = aux.getEscopoPai();
+    if(aux1.herdaDeAlguem()){
+        salvarArq.printf("Linha: %s - Herança múltipla não permitida.%n", linhaAtual);
+    }
+    else{
+        escopoArquivo.addClasse(idAtual, aux);
+    }
+}
+
+
+//#Tipagem de atibuição em variáveis e métodos#
+{
+    if (aux.getMetodo(lexema_declarado) != null || aux.tipoVariavel(lexema_declarado) != null){
+        if (aux.getMetodo(lexema_declarado) == null) {
+            tipo_aux = aux.tipoVariavel(lexema_declarado);
+            //pegar o token do tipo de valor atribuido, não sei como fazer
+            if (tipo_aux == tipo_valor_atribuido)
+                aux.addVariavel(tipo_valor_atribuido, lexema_declarado);
+            else
+                salvarArq.printf("Linha: %s - Tipo não compatível.%n", linhaAtual);
+        }
+        else{
+            metodo_aux = aux.getMetodo(lexema_declarado);
+            //pegar retorno do método, não sei como fazer
+            //pegar o token do tipo de valor atribuido, não sei como fazer
+            if (tipo_retorno == tipo_valor_atribuido)
+                aux.addMetodo(tipo_valor_atribuido, metodo_aux);
+            else
+                salvarArq.printf("Linha: %s - Tipo não compatível.%n", linhaAtual);
+        }       
+    }
+    else{
+        salvarArq.printf("Linha: %s - Variável ou Método não declarado.%n", linhaAtual);
+    }
+}
+
+//#Checar duplicidade de nomes no mesmo escopo#
+{
+    if(escopoAtual.tipoVariavel(nome_declarado) != null){  //nome declarado é o lexema encontrado
+        salvarArq.printf("Linha: %s - Variável já existente neste escopo.%n", linhaAtual);
+    }
+    else{
+        //pegar tipo da variavel, não sei como
+        escopoAtual.addVariavel(tipo, nome_declarado);
+    }
+}
+
+/#Checar sobrecarga#
+{
+    aux1 = aux.getEscopoPai(); //aux é a classe onde o método se encontra
+    metodo_existente = aux1.getMetodo(metodo_declarado); //metodo_declarado é o lexema qualquer de um método / metodo_existente é um método de mesmo nome na classe pai
+    if (metodo_existente != null) {
+        if(metodo_declarado == metodo_existente){
+            if(tipoVariavel(metodo_declarado) == tipoVariavel(metodo_existente)){
+                int i=0;
+                while(i < metodo_declarado.ordemAtributos.length()){
+                    if(metodo_declarado.ordemAtributos[i] == metodo_existente.ordemAtributos[i]){
+                        i++;
+                    }
+                    else{
+                        salvarArq.printf("Linha: %s - Sobrecarga de Método.%n", linhaAtual);
+                    }
+                }
+            }
+            else{
+                salvarArq.printf("Linha: %s - Sobrecarga de Método.%n", linhaAtual);
+            }
+        }
+        else{
+            //pegar tipo, não sei como fazer
+            aux.addMetodo(tipo,metodo_declarado);
+        }
+    }
+}
+
+
+//#Main único#
+{
+    if (metodo_main)
+        salvarArq.printf("Linha: %s - Main já declarada.%n", linhaAtual);
+    else
+        metodo_main = true;
+}
