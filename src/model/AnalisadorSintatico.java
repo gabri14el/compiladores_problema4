@@ -11,9 +11,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 /**
  *
@@ -201,6 +199,7 @@ public class AnalisadorSintatico {
             switch (state) {
                 case 0:
                     if (token.equals("Identificador")) {
+                        idAtual = lexema;
                         state = 1;
                         break;
                     }
@@ -209,8 +208,20 @@ public class AnalisadorSintatico {
 
                 case 1:
                     if (lexema.equals(";")) {
+                        if(!escopoAtual.variavelExiste(idAtual)){
+                            escopoAtual.addVariavel(tipoAtual, idAtual);
+
+                        } else{
+                            salvarArq.printf("Linha: %s - Nome de variável já existe.%n", linhaAtual);
+                        }
                         return true;
                     } else if (lexema.equals(",")) {
+                        if(!escopoAtual.variavelExiste(idAtual)){
+                            escopoAtual.addVariavel(tipoAtual, idAtual);
+
+                        } else{
+                            salvarArq.printf("Linha: %s - Nome de variável já existe.%n", linhaAtual);
+                        }
                         state = 2;
                         break;
                     } else if (lexema.equals("[")) {
@@ -257,6 +268,11 @@ public class AnalisadorSintatico {
                         state = 5;
                         break;
                     } else if (lexema.equals(";")) {
+                        //adicionar um vetor
+                        if(!escopoAtual.variavelExiste(idAtual)){
+                            escopoAtual.addVetor(tipoAtual, idAtual);
+                        }else
+                            salvarArq.printf("Linha: %s - Nome de variável já existe.%n", linhaAtual);
                         return true;
                     }
                     state = 15;
@@ -294,7 +310,10 @@ public class AnalisadorSintatico {
 
                     if (lexema.equals("{")) {
 
+                        //cria o novo escopo
                         Classe aux = new Classe(escopoAtual, tipoAtual);
+
+                        //verifica se o nome da classe já existe
                         if(escopoArquivo.pegaClasse(idAtual) == null)
                             escopoArquivo.addClasse(idAtual, aux);
                         else
@@ -341,15 +360,17 @@ public class AnalisadorSintatico {
                         state = 2;
                         Classe aux = new Classe(escopoAtual, tipoAtual);
                         Classe aux2 = escopoArquivo.pegaClasse(tipoAtual);
-                        //verifiva se a classe existe
+                        //verifiva se a classe mãe existe
                         if(aux2 != null)
                         {
+                            //verifica herança múltipla
                             if(aux2.herdaDeAlguem())
                                 salvarArq.printf("Linha: %s - herança não permitida: a classe mãe já herda de alguém.%n", linhaAtual);
                         }
                         else
                             salvarArq.printf("Linha: %s - classe inexistente.%n", linhaAtual);
 
+                        //verifica se o nome da classe já existe
                         if(escopoArquivo.pegaClasse(idAtual) == null)
                             escopoArquivo.addClasse(idAtual, aux);
                         else
@@ -367,7 +388,7 @@ public class AnalisadorSintatico {
 
     public boolean conteudo_class() throws IOException {
         int state = 0;
-
+        Classe classe = (Classe) escopoAtual;
         while (true) {
             switch (state) {
                 case 0:
@@ -390,26 +411,41 @@ public class AnalisadorSintatico {
 
                 case 2:
                     if (lexema.equals(";")) {
-                        if (variavel(4)) {
+                        if(!escopoAtual.variavelExiste(idAtual)){
                             escopoAtual.addVariavel(tipoAtual, idAtual);
+
+                        } else{
+                            salvarArq.printf("Linha: %s - Nome de variável já existe.%n", linhaAtual);
+                        }
+                        if (variavel(4)) {
+
                             state = 0;
                             break;
                         }
                     } else if (lexema.equals(",")) {
-                        if (variavel(2)) {
+                        if(!escopoAtual.variavelExiste(idAtual)){
                             escopoAtual.addVariavel(tipoAtual, idAtual);
+
+                        } else{
+                            salvarArq.printf("Linha: %s - Nome de variável já existe.%n", linhaAtual);
+                        }
+                        if (variavel(2)) {
                             state = 0;
                             break;
                         }
                     } else if (lexema.equals("[")) {
                         if (variavel(5)) {
-                            escopoAtual.addVetor(tipoAtual, idAtual);
                             state = 0;
                             break;
                         }
                     }
 
                     if (lexema.equals("(")) {
+
+                        //adiciona método à classe
+                        Metodo aux = new Metodo(escopoAtual, idAtual, tipoAtual);
+                        classe.addMetodo(tipoAtual, idAtual);
+                        escopoAtual = aux;
                         if (parametro()) {
                             state = 3;
                             break;
@@ -466,6 +502,7 @@ public class AnalisadorSintatico {
             switch (state) {
                 case 0:
                     if (tipo.contains(lexema)) {
+                        tipoAtual = lexema;
                         variavel(0);
                         state = 0;
                         break;
@@ -489,6 +526,7 @@ public class AnalisadorSintatico {
                         state = 1;
                         break;
                     }
+                    escopoAtual = escopoAtual.getEscopoPai();
                     return true;
 
                 case 1:
@@ -501,7 +539,7 @@ public class AnalisadorSintatico {
                         state = 0;
                         break;
                     }
-
+                    escopoAtual = escopoAtual.getEscopoPai();
                     return false;
             }
         }
@@ -509,7 +547,7 @@ public class AnalisadorSintatico {
 
     public boolean parametro() throws IOException {
         int state = 0;
-
+        Metodo metodo = (Metodo) escopoAtual;
         while (true) {
             if (consumir()) {
                 return false;
@@ -518,6 +556,7 @@ public class AnalisadorSintatico {
             switch (state) {
                 case 0:
                     if (tipo.contains(lexema)) {
+                        tipoAtual = lexema;
                         state = 1;
                         break;
                     }
@@ -525,6 +564,7 @@ public class AnalisadorSintatico {
 
                 case 1:
                     if (token.equals("Identificador")) {
+                        idAtual = lexema;
                         state = 2;
                         break;
                     }
@@ -537,6 +577,10 @@ public class AnalisadorSintatico {
                     }
 
                     if (lexema.equals(",")) {
+                        if(!metodo.atributoExiste(idAtual))
+                            metodo.addAtributo(tipoAtual, idAtual);
+                        else
+                            salvarArq.printf("Linha: %s - Nome de parâmetro já existe.%n", linhaAtual);
                         state = 0;
                         break;
                     }
@@ -551,6 +595,11 @@ public class AnalisadorSintatico {
 
                 case 4:
                     if (lexema.equals("]")) {
+                        if(!metodo.atributoExiste(idAtual)){
+                            metodo.addAtributoVetor(tipoAtual, idAtual);
+                        }else {
+                            salvarArq.printf("Linha: %s - Nome de parâmetro já existe.%n", linhaAtual);
+                        }
                         state = 5;
                         break;
                     }
@@ -615,6 +664,17 @@ public class AnalisadorSintatico {
         }
     }
 
+    private boolean variavelExiste(){
+        boolean existe = false;
+        Escopo escopo = escopoAtual;
+        while(escopo != null && !existe){
+            existe = escopo.variavelExiste(idAtual);
+            escopo = escopo.getEscopoPai();
+        }
+        return existe;
+
+
+    }
     public boolean print() throws IOException {
         int state = 0;
         Stack pilhaPrint = new Stack();
@@ -641,6 +701,12 @@ public class AnalisadorSintatico {
                         state = 2;
                         break;
                     } else if (token.equals("Identificador") || token.equals("Número")) {
+                        if(token.equals("Identidicador")){
+                            idAtual = lexema;
+                            if(!variavelExiste())
+                                salvarArq.printf("Linha: %s - Variável não existe.%n", linhaAtual);;
+                        }
+
                         state = 3;
                         break;
                     }

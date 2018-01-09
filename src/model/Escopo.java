@@ -38,4 +38,8 @@ public class Escopo {
         variaveis.put(nome, tipo);
     }
 
+    public boolean variavelExiste(String identificador){
+        return variaveis.get(identificador) != null;
+    }
+
 }
