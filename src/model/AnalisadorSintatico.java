@@ -51,6 +51,9 @@ public class AnalisadorSintatico {
     String idAtual;
     Escopo escopoAtual;
     boolean heranca = false;
+    boolean achouRelacionalOuLogico = false;
+    boolean achouPontoNoNumero = false;
+
 
 
     public AnalisadorSintatico(String arquivo) {
@@ -669,12 +672,13 @@ public class AnalisadorSintatico {
         Escopo escopo = escopoAtual;
         while(escopo != null && !existe){
             existe = escopo.variavelExiste(idAtual);
+            if (escopoAtual.getEscopoPai() == null && !existe)
+                existe = ((EscopoArquivo) escopoAtual).variavelExiste(idAtual);
             escopo = escopo.getEscopoPai();
         }
         return existe;
-
-
     }
+
     public boolean print() throws IOException {
         int state = 0;
         Stack pilhaPrint = new Stack();
@@ -704,7 +708,7 @@ public class AnalisadorSintatico {
                         if(token.equals("Identidicador")){
                             idAtual = lexema;
                             if(!variavelExiste())
-                                salvarArq.printf("Linha: %s - Variável não existe.%n", linhaAtual);;
+                                salvarArq.printf("Linha: %s - Variável não existe.%n", linhaAtual);
                         }
 
                         state = 3;
@@ -777,6 +781,9 @@ public class AnalisadorSintatico {
 
                 case 1:
                     if (token.equals("Identificador")) {
+                        idAtual = lexema;
+                        if(!variavelExiste())
+                            salvarArq.printf("Linha: %s - Variável não existe.%n", linhaAtual);
                         state = 2;
                         break;
                     }
@@ -808,8 +815,76 @@ public class AnalisadorSintatico {
         }
     }
 
+    /**
+     * Verifica se o idAtual corresponde a um vetor
+     * @return se o idAtual e o nome de um vetor, ou nao
+     */
+    private boolean vetorExiste(){
+        boolean existe = false;
+        Escopo escopo = escopoAtual;
+        while(escopo != null && !existe){
+            existe = escopo.vetorExiste(idAtual);
+            escopo = escopo.getEscopoPai();
+        }
+        return existe;
+    }
+
+
+    /**
+     * Compara de dois tipos sao iguais
+     * @param tipo1 primeiro tipo
+     * @param tipo2 segundo tipo
+     * @return se os tipos sao iguais
+     */
+    private boolean comparaTipos(String tipo1, String tipo2){
+        return tipo1.equals(tipo2);
+    }
+
+    /**
+     * Compara de dois numeros sao do mesmo tipo
+     * @param numero1 numero 1
+     * @param numero2 numero 2
+     * @return se eles sao do mesmo tipo
+     */
+    private boolean comparaNumeros(String numero1, String numero2){
+        return (numero1.contains(".") && numero2.contains("."))
+                || (!numero1.contains(".") && !numero2.contains("."));
+    }
+
+    /**
+     * verifica se um numero e de determinado tipo
+     * @param numero numero
+     * @param tipo tipo
+     * @return se o numero e do tipo passado por parametro
+     */
+    private boolean comparaNumeroETipo(String numero, String tipo){
+        boolean saoDoMesmoTipo = false;
+        if(numero.contains(".") && tipo.equals("float"))
+            saoDoMesmoTipo = true;
+        else if(!numero.contains(".") && tipo.equals("int"))
+            saoDoMesmoTipo = true;
+        else
+            saoDoMesmoTipo = false;
+
+        return saoDoMesmoTipo;
+    }
+
+    private String tipoVariavel(String nome){
+        String tipo = null;
+        Escopo escopo = escopoAtual;
+        while(escopo != null && tipo == null){
+            tipo = escopo.tipoVariavel(nome);
+            if (escopoAtual.getEscopoPai() == null && tipo == null)
+                tipo = ((EscopoArquivo) escopoAtual).tipoVariavel(nome);
+            escopo = escopo.getEscopoPai();
+        }
+        return tipo;
+    }
+
+
     public boolean atribuicao(int n) throws IOException {
 
+        String auxiliar;
         int state = n;
         String linha = linhaAtual;
 
@@ -821,6 +896,7 @@ public class AnalisadorSintatico {
             switch (state) {
                 case 0:
                     if (token.equals("Identificador")) {
+                        idAtual = lexema;
                         state = 1;
                         break;
                     }
@@ -829,9 +905,13 @@ public class AnalisadorSintatico {
 
                 case 1:
                     if (lexema.equals("[")) {
+                        if(!vetorExiste())
+                            salvarArq.printf("Linha: %d - Vetor nao existe", linhaAtual);;
                         state = 2;
                         break;
                     } else if (lexema.equals("=")) {
+                        if(!variavelExiste())
+                            salvarArq.printf("Linha: %d - Variavel nao existe", linhaAtual);;
                         state = 5;
                         break;
                     }
@@ -868,12 +948,25 @@ public class AnalisadorSintatico {
                 case 5:
                     if (token.equals("Número")) {
                         expLogica();
+                        if(achouRelacionalOuLogico){
+                            if(!comparaTipos("bool", tipoAtual))
+                                salvarArq.printf("Linha: %d - Tipos nao compativeis", linhaAtual);;
+                        }else {
+                            //saber se o tipo e float ou int
+                        }
+
                         if (lexema.equals(";")) {
                             return true;
                         }
                         state = 15;
                         break;
                     } else if (token.equals("Identificador")) {
+                        if(!variavelExiste()){
+                            salvarArq.printf("Linha: %d - Variavel nao existe", linhaAtual);
+                        }
+                        if(!comparaTipos(escopoAtual.tipoVariavel(idAtual),tipoVariavel(lexema))){
+                            salvarArq.printf("Linha: %d - Tipos nao compativeis", linhaAtual);
+                        }
                         state = 6;
                         break;
                     }
@@ -942,6 +1035,7 @@ public class AnalisadorSintatico {
 
                 case 3:
                     if (lexema.equals("{")) {
+                        escopoAtual = new Escopo(escopoAtual);
                         state = 4;
                         break;
                     }
@@ -958,6 +1052,7 @@ public class AnalisadorSintatico {
 
                 case 5:
                     if (lexema.equals("}")) {
+                        escopoAtual = escopoAtual.getEscopoPai();
                         state = 6;
                         break;
                     }
@@ -974,6 +1069,7 @@ public class AnalisadorSintatico {
 
                 case 7:
                     if (lexema.equals("{")) {
+                        escopoAtual = new Escopo(escopoAtual);
                         state = 8;
                         break;
                     }
@@ -990,6 +1086,7 @@ public class AnalisadorSintatico {
 
                 case 9:
                     if (lexema.equals("}")) {
+                        escopoAtual = escopoAtual.getEscopoPai();
                         return true;
                     }
                     state = 15;
@@ -1250,9 +1347,12 @@ public class AnalisadorSintatico {
                         state = 20;
                         break;
                     } else if (token.equals("Operador_Relacional") || token.equals("Operador_Aritmético")) {
+                        if(token.equals("Operador_Relacional"))
+                            achouRelacionalOuLogico = true;
                         state = 8;
                         break;
                     } else if (token.equals("Operador_Lógico")) {
+                            achouRelacionalOuLogico = true;
                         state = 4;
                         break;
                     }

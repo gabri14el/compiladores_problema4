@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Queue;
 
+/***
+ * Representa o escopo de um metodo
+ */
 public class Metodo extends Escopo {
 
 
