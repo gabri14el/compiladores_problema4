@@ -369,14 +369,14 @@ public class AnalisadorSintatico {
                             //verifica herança múltipla
                             if(aux2.herdaDeAlguem())
                                 salvarArq.printf("Linha: %s - herança não permitida: a classe mãe já herda de alguém.%n", linhaAtual);
-
+                            else
+                                aux.herdar(aux2);
                         }
                         else
                             salvarArq.printf("Linha: %s - classe inexistente.%n", linhaAtual);
 
                         //verifica se o nome da classe já existe
                         if(escopoArquivo.pegaClasse(idAtual) == null){
-
                             escopoArquivo.addClasse(idAtual, aux);
                         }
 
@@ -395,7 +395,9 @@ public class AnalisadorSintatico {
 
     public boolean conteudo_class() throws IOException {
         int state = 0;
+        boolean sobrescrita = false;
         Classe classe = (Classe) escopoAtual;
+        String auxiliar = null;
         while (true) {
             switch (state) {
                 case 0:
@@ -450,10 +452,33 @@ public class AnalisadorSintatico {
                     if (lexema.equals("(")) {
 
                         //adiciona método à classe
+                        auxiliar = idAtual;
                         Metodo aux = new Metodo(escopoAtual, idAtual, tipoAtual);
-                        classe.addMetodo(tipoAtual, idAtual);
+                        Metodo aux2 = getMetodo(idAtual);
+                        if(aux2 != null){
+                            //se o método já existir, verifica se é uma sobrescrita
+                            if(classe.herdaDeAlguem()){
+                                Classe aux3 = escopoArquivo.pegaClasse(classe.classeMae);
+                                if(aux3.getMetodo(idAtual) != null){
+                                    sobrescrita = true;
+                                }else
+                                    salvarArq.printf("Linha: %s -nome de método já existe.%n", linhaAtual);
+                            }else{
+                                salvarArq.printf("Linha: %s -nome de método já existe.%n", linhaAtual);
+                            }
+                        }
+                        else
+                            classe.addMetodo(tipoAtual, idAtual);
                         escopoAtual = aux;
+
                         if (parametro()) {
+                            //se for tentativa so sobrescrita, verifica-se se foi feita corretamente
+                            if(sobrescrita){
+                                sobrescrita = false;
+                                Classe aux3 = escopoArquivo.pegaClasse(classe.classeMae);
+                                if(!aux3.getMetodo(auxiliar).equals(aux))
+                                    salvarArq.printf("Linha: %s -tentativa errada de sobrescrita, verifique os parâmetros e o retorno.%n", linhaAtual);
+                            }
                             state = 3;
                             break;
                         }

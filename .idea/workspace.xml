@@ -3,8 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="d6f3355d-80da-4096-8f9f-e94b7dab85ca" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/src/model/AnalisadorSintatico.java" afterPath="$PROJECT_DIR$/src/model/AnalisadorSintatico.java" />
-      <change beforePath="$PROJECT_DIR$/src/model/Classe.java" afterPath="$PROJECT_DIR$/src/model/Classe.java" />
-      <change beforePath="$PROJECT_DIR$/src/model/Metodo.java" afterPath="$PROJECT_DIR$/src/model/Metodo.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -16,16 +14,16 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="AnalisadorSintatico.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="AnalisadorSintatico.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/model/AnalisadorSintatico.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="416">
-              <caret line="378" column="0" lean-forward="false" selection-start-line="378" selection-start-column="0" selection-end-line="378" selection-end-column="0" />
+            <state relative-caret-position="-196">
+              <caret line="479" column="133" lean-forward="false" selection-start-line="479" selection-start-column="133" selection-end-line="479" selection-end-column="133" />
               <folding>
-                <element signature="e#28203#28204#0" expanded="true" />
-                <element signature="e#28245#28246#0" expanded="true" />
-                <element signature="e#64573#64574#0" expanded="true" />
-                <element signature="e#64619#64620#0" expanded="true" />
+                <element signature="e#29772#29773#0" expanded="true" />
+                <element signature="e#29814#29815#0" expanded="true" />
+                <element signature="e#66142#66143#0" expanded="true" />
+                <element signature="e#66188#66189#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -39,16 +37,6 @@
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Metodo.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/model/Metodo.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1285">
-              <caret line="77" column="77" lean-forward="false" selection-start-line="77" selection-start-column="77" selection-end-line="77" selection-end-column="77" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -81,9 +69,9 @@
         <option value="$PROJECT_DIR$/src/model/EscopoClasse.java" />
         <option value="$PROJECT_DIR$/src/model/EscopoArquivo.java" />
         <option value="$PROJECT_DIR$/src/model/Escopo.java" />
-        <option value="$PROJECT_DIR$/src/model/AnalisadorSintatico.java" />
         <option value="$PROJECT_DIR$/src/model/Classe.java" />
         <option value="$PROJECT_DIR$/src/model/Metodo.java" />
+        <option value="$PROJECT_DIR$/src/model/AnalisadorSintatico.java" />
       </list>
     </option>
   </component>
@@ -274,8 +262,8 @@
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23636363" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.26136363" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23636363" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26136363" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
@@ -301,10 +289,10 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#28203#28204#0" expanded="true" />
-            <element signature="e#28245#28246#0" expanded="true" />
-            <element signature="e#64573#64574#0" expanded="true" />
-            <element signature="e#64619#64620#0" expanded="true" />
+            <element signature="e#29772#29773#0" expanded="true" />
+            <element signature="e#29814#29815#0" expanded="true" />
+            <element signature="e#66142#66143#0" expanded="true" />
+            <element signature="e#66188#66189#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -314,10 +302,10 @@
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <element signature="e#28203#28204#0" expanded="true" />
-            <element signature="e#28245#28246#0" expanded="true" />
-            <element signature="e#64573#64574#0" expanded="true" />
-            <element signature="e#64619#64620#0" expanded="true" />
+            <element signature="e#29772#29773#0" expanded="true" />
+            <element signature="e#29814#29815#0" expanded="true" />
+            <element signature="e#66142#66143#0" expanded="true" />
+            <element signature="e#66188#66189#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -451,16 +439,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/model/AnalisadorSintatico.java">
+    <entry file="file://$PROJECT_DIR$/src/model/Metodo.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="416">
-          <caret line="378" column="0" lean-forward="false" selection-start-line="378" selection-start-column="0" selection-end-line="378" selection-end-column="0" />
-          <folding>
-            <element signature="e#28203#28204#0" expanded="true" />
-            <element signature="e#28245#28246#0" expanded="true" />
-            <element signature="e#64573#64574#0" expanded="true" />
-            <element signature="e#64619#64620#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="1314">
+          <caret line="77" column="77" lean-forward="false" selection-start-line="77" selection-start-column="77" selection-end-line="77" selection-end-column="77" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -474,11 +457,16 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/model/Metodo.java">
+    <entry file="file://$PROJECT_DIR$/src/model/AnalisadorSintatico.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1285">
-          <caret line="77" column="77" lean-forward="false" selection-start-line="77" selection-start-column="77" selection-end-line="77" selection-end-column="77" />
-          <folding />
+        <state relative-caret-position="-196">
+          <caret line="479" column="133" lean-forward="false" selection-start-line="479" selection-start-column="133" selection-end-line="479" selection-end-column="133" />
+          <folding>
+            <element signature="e#29772#29773#0" expanded="true" />
+            <element signature="e#29814#29815#0" expanded="true" />
+            <element signature="e#66142#66143#0" expanded="true" />
+            <element signature="e#66188#66189#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
