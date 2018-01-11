@@ -897,21 +897,26 @@ public class AnalisadorSintatico {
                 case 0:
                     if (token.equals("Identificador")) {
                         idAtual = lexema;
+
                         state = 1;
                         break;
                     }
                     state = 15;
                     break;
 
-                case 1:
+                case 1: //verifica aqui se variavel existe ou nao
                     if (lexema.equals("[")) {
                         if(!vetorExiste())
-                            salvarArq.printf("Linha: %d - Vetor nao existe", linhaAtual);;
+                            salvarArq.printf("Linha: %d - Vetor nao existe", linhaAtual);
+                        else
+                            tipoAtual = tipoVariavel(idAtual);
                         state = 2;
                         break;
                     } else if (lexema.equals("=")) {
                         if(!variavelExiste())
-                            salvarArq.printf("Linha: %d - Variavel nao existe", linhaAtual);;
+                            salvarArq.printf("Linha: %d - Variavel nao existe", linhaAtual);
+                        else
+                            tipoAtual = tipoVariavel(idAtual);
                         state = 5;
                         break;
                     }
@@ -920,6 +925,8 @@ public class AnalisadorSintatico {
 
                 case 2:
                     if (token.equals("Número")) {
+                        if(lexema.contains("."))
+                            salvarArq.printf("Linha: %d - tipo incompatível para índice de vetor", linhaAtual);
                         state = 3;
                         break;
                     }
@@ -950,7 +957,8 @@ public class AnalisadorSintatico {
                         expLogica();
                         if(achouRelacionalOuLogico){
                             if(!comparaTipos("bool", tipoAtual))
-                                salvarArq.printf("Linha: %d - Tipos nao compativeis", linhaAtual);;
+                                salvarArq.printf("Linha: %d - Tipos nao compativeis", linhaAtual);
+                            achouRelacionalOuLogico = false;
                         }else {
                             //saber se o tipo e float ou int
                         }
@@ -961,12 +969,7 @@ public class AnalisadorSintatico {
                         state = 15;
                         break;
                     } else if (token.equals("Identificador")) {
-                        if(!variavelExiste()){
-                            salvarArq.printf("Linha: %d - Variavel nao existe", linhaAtual);
-                        }
-                        if(!comparaTipos(escopoAtual.tipoVariavel(idAtual),tipoVariavel(lexema))){
-                            salvarArq.printf("Linha: %d - Tipos nao compativeis", linhaAtual);
-                        }
+                        idAtual = lexema;
                         state = 6;
                         break;
                     }
@@ -1396,6 +1399,8 @@ public class AnalisadorSintatico {
         int state = 0;
         Stack pLogica = new Stack();
         String linha = linhaAtual;
+        String tipoDeNumero = null;
+        String auxiliar = null;
 
         while (true) {
             if (consumir()) {
@@ -1409,6 +1414,23 @@ public class AnalisadorSintatico {
                         state = 0;
                         break;
                     } else if (token.equals("Identificador")) {
+                        idAtual = lexema;
+                        if(variavelExiste()){
+                            auxiliar = tipoVariavel(idAtual);
+                            if(!auxiliar.equals("int") && !auxiliar.equals("float") && !auxiliar.equals("bool"))
+                                salvarArq.printf("Linha: %s - tipo de variavel nao compativel", linhaAtual);
+                            else{
+                                //verifica se ha tentativa de conversao implicita
+                                if(tipoDeNumero == null){
+                                    tipoDeNumero = auxiliar;
+                                }else{
+                                    if(!tipoDeNumero.equals(auxiliar)){
+                                        salvarArq.printf("Linha: %s - tentativa de conversao implicita", linhaAtual);
+                                    }
+                                }
+                            }
+                        }else
+                            salvarArq.printf("Linha: %s - Variavel nao existe", linhaAtual);
                         state = 1;
                         break;
                     } else if (token.equals("Número")) {
@@ -1439,6 +1461,14 @@ public class AnalisadorSintatico {
 
                 case 4:
                     if (token.equals("Identificador")) {
+                        idAtual = lexema;
+                        if(variavelExiste()){
+                            if(!auxiliar.equals("bool") || !VerificaTipoDeVariavelEsperado(lexema, "bool")){
+                                salvarArq.printf("Linha: %s - Variavel nao existe", linhaAtual);
+                            }
+                        }else
+                            salvarArq.printf("Linha: %s - Variavel nao existe", linhaAtual);
+
                         state = 5;
                         break;
                     } else if (lexema.equals("(")) {
@@ -1460,6 +1490,8 @@ public class AnalisadorSintatico {
                         state = 4;
                         break;
                     } else if (token.equals("Operador_Aritmético") || token.equals("Operador_Relacional")) {
+                        if(token.equals("Operador_Relacional"))
+                            achouRelacionalOuLogico = true;
                         state = 8;
                         break;
                     } else if (lexema.equals(")")) {
@@ -1476,6 +1508,8 @@ public class AnalisadorSintatico {
 
                 case 9:
                     if (token.equals("Operador_Aritmético") || token.equals("Operador_Relacional")) {
+                        if(token.equals("Operador_Relacional"))
+                            achouRelacionalOuLogico = true;
                         state = 8;
                         break;
                     } else {
@@ -1528,6 +1562,8 @@ public class AnalisadorSintatico {
                         state = 20;
                         break;
                     } else if (token.equals("Operador_Aritmético") || token.equals("Operador_Relacional")) {
+                        if(token.equals("Operador_Relacional"))
+                            achouRelacionalOuLogico = true;
                         state = 8;
                     } else if (token.equals("Operador_Lógico")) {
                         state = 4;
@@ -1536,8 +1572,10 @@ public class AnalisadorSintatico {
 
                 case 3:
                     if (token.equals("Operador_Relacional")) {
+                        achouRelacionalOuLogico = true;
                         state = 8;
                     } else if (token.equals("Operador_Lógico")) {
+                        achouRelacionalOuLogico = true;
                         state = 4;
                     } else if (token.equals("Operador_Aritmético")) {
                         state = 9;
@@ -1566,9 +1604,13 @@ public class AnalisadorSintatico {
                         break;
                     }
                     if (token.equals("Operador_Lógico")) {
+                        if(token.equals("Operador_Relacional"))
+                            achouRelacionalOuLogico = true;
                         state = 4;
                         break;
                     } else if (token.equals("Operador_Aritmético") || token.equals("Operador_Relacional")) {
+                        if(token.equals("Operador_Relacional"))
+                            achouRelacionalOuLogico = true;
                         state = 8;
                         break;
                     } else if (lexema.equals(")")) {
@@ -1665,6 +1707,7 @@ public class AnalisadorSintatico {
                         state = 30;
                         break;
                     } else if (token.equals("Operador_Relacional")) {
+                        achouRelacionalOuLogico = true;
                         state = 3;
                         break;
                     } else if (token.equals("Operador_Aritmético")) {
@@ -1683,6 +1726,9 @@ public class AnalisadorSintatico {
 
                 case 30:
                     if (token.equals("Número")) {
+                        if(lexema.contains(".")){
+                            salvarArq.printf("Linha: %s - tipo nao compatível, deve-se usar numeros inteiros", linhaAtual);
+                        }
                         state = 31;
                         break;
                     }
@@ -1702,6 +1748,7 @@ public class AnalisadorSintatico {
                         state = 30;
                         break;
                     } else if (token.equals("Operador_Relacional")) {
+                        achouRelacionalOuLogico = true;
                         state = 3;
                         break;
                     } else if (token.equals("Operador_Aritmético")) {
@@ -1712,6 +1759,7 @@ public class AnalisadorSintatico {
 
                 case 2:
                     if (token.equals("Operador_Relacional")) {
+                        achouRelacionalOuLogico = true;
                         state = 3;
                         break;
                     } else if (token.equals("Operador_Aritmético")) {
@@ -1734,6 +1782,15 @@ public class AnalisadorSintatico {
                         state = 0;
                         break;
                     } else if (token.equals("Número")) {
+                        //verifica se ha tentativa de conversao implicita
+                        auxiliar = tipoDeNumero(lexema);
+                        if(tipoDeNumero == null){
+                            tipoDeNumero = auxiliar;
+                        }else{
+                            if(!tipoDeNumero.equals(auxiliar)){
+                                salvarArq.printf("Linha: %s - Tipo incompatível", linhaAtual);
+                            }
+                        }
                         state = 2;
                         break;
                     }
@@ -1743,6 +1800,7 @@ public class AnalisadorSintatico {
                 case 4:
                     expAritmetica(4);
                     if (token.equals("Operador_Relacional")) {
+                        achouRelacionalOuLogico = true;
                         state = 3;
                         break;
                     } else if (token.equals("Operador_Aritmético")) {
@@ -1771,6 +1829,7 @@ public class AnalisadorSintatico {
         }
     }
 
+    //private boolean verificaChamadaDeMetodo(String)
     public boolean chamadaMetodo(int n) throws IOException {
         int state = n;
         String linha = linhaAtual;
@@ -1783,6 +1842,8 @@ public class AnalisadorSintatico {
             switch (state) {
                 case 0:
                     if (token.equals("Identificador")) {
+                        idAtual = lexema;
+
                         state = 1;
                         break;
                     }
@@ -1794,6 +1855,10 @@ public class AnalisadorSintatico {
                         state = 30;
                         break;
                     } else if (lexema.equals(":")) {
+                        if(variavelExiste())
+                            tipoAtual = tipoVariavel(idAtual);
+                        else
+                            salvarArq.printf("Linha: %s - Variavel nao existe", linhaAtual);
                         state = 2;
                         break;
                     }
