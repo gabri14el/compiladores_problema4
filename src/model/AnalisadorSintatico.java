@@ -369,13 +369,17 @@ public class AnalisadorSintatico {
                             //verifica herança múltipla
                             if(aux2.herdaDeAlguem())
                                 salvarArq.printf("Linha: %s - herança não permitida: a classe mãe já herda de alguém.%n", linhaAtual);
+
                         }
                         else
                             salvarArq.printf("Linha: %s - classe inexistente.%n", linhaAtual);
 
                         //verifica se o nome da classe já existe
-                        if(escopoArquivo.pegaClasse(idAtual) == null)
+                        if(escopoArquivo.pegaClasse(idAtual) == null){
+
                             escopoArquivo.addClasse(idAtual, aux);
+                        }
+
                         else
                             salvarArq.printf("Linha: %s - Nome de classe já existente %n", linhaAtual);
                         escopoAtual = aux;
@@ -674,6 +678,18 @@ public class AnalisadorSintatico {
             existe = escopo.variavelExiste(idAtual);
             if (escopoAtual.getEscopoPai() == null && !existe)
                 existe = ((EscopoArquivo) escopoAtual).variavelExiste(idAtual);
+            escopo = escopo.getEscopoPai();
+        }
+        return existe;
+    }
+
+    private boolean variavelExiste(String nome){
+        boolean existe = false;
+        Escopo escopo = escopoAtual;
+        while(escopo != null && !existe){
+            existe = escopo.variavelExiste(nome);
+            if (escopoAtual.getEscopoPai() == null && !existe)
+                existe = ((EscopoArquivo) escopoAtual).variavelExiste(nome);
             escopo = escopo.getEscopoPai();
         }
         return existe;
@@ -1829,10 +1845,68 @@ public class AnalisadorSintatico {
         }
     }
 
-    //private boolean verificaChamadaDeMetodo(String)
+
+    /**
+     * Verifica se chamada de método pertencente a outra classe está correto
+     * @param tipo nome da outra classe
+     * @param nomeDoMetodo nome do método
+     * @param parametros lista de parâmetros
+     * @return se a chamada está ou não correta
+     */
+    private boolean verificaChamadaDeMetodo(String tipo, String nomeDoMetodo, List<String> parametros){
+        Classe classe = escopoArquivo.pegaClasse(tipo);
+        Metodo metodo = classe.getMetodo(nomeDoMetodo);
+        if(metodo != null){
+            return metodo.comparaOrdemDosParametros(parametros);
+        }else{
+            return false;
+        }
+    }
+
+    /**
+     * Método que busca determinado método dentro do escopo de uma classe
+     * @param nome nome do metodo
+     * @return o metodo
+     */
+    private Metodo getMetodo(String nome){
+        Escopo auxiliar = escopoAtual;
+        while(!(auxiliar instanceof Classe)){
+            auxiliar = auxiliar.getEscopoPai();
+        }
+        Classe classe = (Classe) escopoAtual;
+        return classe.getMetodo(nome);
+    }
+
+    /**
+     * Método verifica se chamada de método está correta
+     * @param nomeDoMetodo
+     * @param parametros
+     * @return
+     */
+    private boolean verificaChamadaDeMetodo(String nomeDoMetodo, List<String> parametros){
+        Metodo metodo = getMetodo(nomeDoMetodo);
+        if(metodo != null){
+            return metodo.comparaOrdemDosParametros(parametros);
+        }else{
+            return false;
+        }
+    }
+
+    /**
+     * Método que retorna se um metodo existe
+     * @param nome nome do metodo
+     * @return se o método existe ou não
+     */
+    private boolean metodoExiste(String nome){
+        return getMetodo(nome) != null;
+    }
+
+
     public boolean chamadaMetodo(int n) throws IOException {
         int state = n;
         String linha = linhaAtual;
+        List<String> parametros = new ArrayList<>();
+        String auxiliar = null;
 
         while (true) {
             if (consumir()) {
@@ -1843,6 +1917,7 @@ public class AnalisadorSintatico {
                 case 0:
                     if (token.equals("Identificador")) {
                         idAtual = lexema;
+                        auxiliar = lexema;
 
                         state = 1;
                         break;
@@ -1875,6 +1950,10 @@ public class AnalisadorSintatico {
 
                 case 3:
                     if (token.equals("Identificador")) {
+                        if(variavelExiste(lexema)){
+                            parametros.add(tipoVariavel(lexema));
+                        }else
+                            salvarArq.printf("Linha: %s - Variavel nao existe", linhaAtual);
                         state = 4;
                         break;
                     }
@@ -1886,6 +1965,13 @@ public class AnalisadorSintatico {
                         state = 3;
                         break;
                     } else if (lexema.equals(")")) {
+                        if(metodoExiste(auxiliar)){
+                            if(!verificaChamadaDeMetodo(auxiliar, parametros))
+                                salvarArq.printf("Linha: %s - Erro na Chamada do Método, verifique os parâmetros.%n", linha);
+                        }else{
+                            salvarArq.printf("Linha: %s - Método não existe.%n", linha);
+                        }
+
                         return true;
                     }
                     state = 15;
@@ -1896,6 +1982,8 @@ public class AnalisadorSintatico {
 
                 case 30:
                     if (token.equals("Número")) {
+                        if(lexema.contains("."))
+                            salvarArq.printf("Linha: %s - Não é permitido numero decimal como indice de vetor.%n", linha);
                         state = 31;
                         break;
                     }

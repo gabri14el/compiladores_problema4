@@ -1,6 +1,7 @@
 package model;
 
 import java.util.HashMap;
+import java.util.List;
 
 /***
  * Representa o escopo de uma classe
@@ -73,6 +74,16 @@ public class Classe extends Escopo{
      */
     public boolean metodoExiste(String nome){
         return getMetodo(nome) != null;
+    }
+
+    /**
+     * Método que copia todos os atributos para da classe mae para a classe filha
+     * @param mae
+     */
+    public void herdar(Classe mae){
+        variaveis.putAll(mae.variaveis);
+        vetores.putAll(mae.vetores);
+        metodos.putAll(mae.metodos);
     }
 
 }

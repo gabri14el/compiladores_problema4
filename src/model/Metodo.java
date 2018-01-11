@@ -1,9 +1,6 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Queue;
+import java.util.*;
 
 /***
  * Representa o escopo de um metodo
@@ -14,6 +11,8 @@ public class Metodo extends Escopo {
     //========================================
     ArrayList<String> ordemAtributos;
     HashMap<String, String> atributos;
+    String nome;
+    String retorno;
     //========================================
 
 
@@ -26,6 +25,8 @@ public class Metodo extends Escopo {
     public Metodo(Escopo escopoPai, String nome, String retorno) {
         super(escopoPai);
         variaveis.put(nome, retorno);
+        this.nome = nome;
+        this.retorno = retorno;
         ordemAtributos = new ArrayList<>();
         atributos = new HashMap<>();
     }
@@ -71,5 +72,55 @@ public class Metodo extends Escopo {
      */
     public boolean atributoExiste(String nome){
         return atributos.get(nome) != null;
+    }
+
+    /**
+     * Método compara ordem de parâmetros recebida com a de método em questão
+     * @param parametros
+     * @return
+     */
+    public boolean comparaOrdemDosParametros(List<String> parametros){
+        boolean iguais = true;
+        if(parametros.size() != ordemAtributos.size())
+            return false;
+        else{
+            for(int i = 0; i < parametros.size(); i++){
+                if(!parametros.get(i).equals(ordemAtributos.get(i)))
+                    iguais = false;
+            }
+            return iguais;
+        }
+    }
+
+    /**
+     * Compara se dois métodos são iguais
+     * Julgamos dois métodos como iguais aqui caso eles tenham o mesmo nome, retorno,
+     * mesma quantidade e tipo de parâmetros.
+     * @param obj metodo a ser comparado
+     * @return se são iguais ou não
+     */
+    @Override
+    public boolean equals(Object obj) {
+        boolean iguais = true;
+        if(obj instanceof Metodo){
+            Metodo recebido = (Metodo) obj;
+            if(recebido.nome.equals(this.nome)){
+                if(recebido.retorno.equals(retorno)){
+                    if(recebido.ordemAtributos.size() == ordemAtributos.size()){
+                        for(int i = 0; i < recebido.ordemAtributos.size(); i++){
+                            if(!recebido.ordemAtributos.get(i).equals(ordemAtributos.get(i)))
+                                iguais = false;
+                        }
+                        return iguais;
+                    }else
+                        return false;
+                }else
+                    return false;
+            } else
+                return false;
+
+        }
+        else
+            return false;
     }
 }
