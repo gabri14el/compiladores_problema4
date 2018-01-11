@@ -1198,10 +1198,34 @@ public class AnalisadorSintatico {
         }
     }
 
+    /**
+     * Retorna se um numero e do tipo int ou do tipo floar
+     * @param numero lexema representante do numero
+     * @return seu tipo
+     */
+    private String tipoDeNumero(String numero){
+        if(numero.contains("."))
+            return "float";
+        else
+            return "int";
+    }
+
+
+    /**
+     * Retorna se uma variavel que ja existe, e de determinado tipo
+     * @param nome nome da variavel
+     * @param tipoEsperado tipo esperado
+     * @return se o tipo esperado e igual ao tipo da variavel
+     */
+    private boolean VerificaTipoDeVariavelEsperado(String nome, String tipoEsperado){
+        return tipoVariavel(nome).equals(tipoEsperado);
+    }
+
     public boolean expAritmetica(int n) throws IOException {
         int state = n;
         Stack pAritmetica = new Stack();
-
+        String auxiliar = null;
+        String tipoDeNumero = null;
         while (true) {
             if (consumir()) {
                 return false;
@@ -1215,9 +1239,38 @@ public class AnalisadorSintatico {
                         break;
                     }
                     if (token.equals("Identificador")) {
+                        idAtual = lexema;
+                        if(variavelExiste()){
+                            auxiliar = tipoVariavel(idAtual);
+                            if(!auxiliar.equals("int") && !auxiliar.equals("float"))
+                                salvarArq.printf("Linha: %s - tipo de variavel nao compativel", linhaAtual);
+                            else{
+                                //verifica se ha tentativa de conversao implicita
+                                if(tipoDeNumero == null){
+                                    tipoDeNumero = auxiliar;
+                                }else{
+                                    if(!tipoDeNumero.equals(auxiliar)){
+                                        salvarArq.printf("Linha: %s - tentativa de conversao implicita", linhaAtual);
+                                    }
+                                }
+                            }
+                        }else
+                            salvarArq.printf("Linha: %s - Variavel nao existe", linhaAtual);
+
+
                         state = 1;
                         break;
                     } else if (token.equals("Número")) {
+
+                        //verifica se ha tentativa de conversao implicita
+                        auxiliar = tipoDeNumero(lexema);
+                        if(tipoDeNumero == null){
+                            tipoDeNumero = auxiliar;
+                        }else{
+                            if(!tipoDeNumero.equals(auxiliar)){
+                                salvarArq.printf("Linha: %s - Variavel nao existe", linhaAtual);
+                            }
+                        }
                         state = 2;
                         break;
                     }
@@ -1292,9 +1345,35 @@ public class AnalisadorSintatico {
 
                 case 4:
                     if (token.equals("Identificador")) {
+                        idAtual = lexema;
+                        if(variavelExiste()){
+                            auxiliar = tipoVariavel(idAtual);
+                            if(!auxiliar.equals("int") && !auxiliar.equals("float"))
+                                salvarArq.printf("Linha: %s - tipo de variavel nao compativel", linhaAtual);
+                            else{
+                                //verifica se ha tentativa de conversao implicita
+                                if(tipoDeNumero == null){
+                                    tipoDeNumero = auxiliar;
+                                }else{
+                                    if(!tipoDeNumero.equals(auxiliar)){
+                                        salvarArq.printf("Linha: %s - tentativa de conversao implicita", linhaAtual);
+                                    }
+                                }
+                            }
+                        }else
+                            salvarArq.printf("Linha: %s - Variavel nao existe", linhaAtual);
                         state = 1;
                         break;
                     } else if (token.equals("Número")) {
+                        //verifica se ha tentativa de conversao implicita
+                        auxiliar = tipoDeNumero(lexema);
+                        if(tipoDeNumero == null){
+                            tipoDeNumero = auxiliar;
+                        }else{
+                            if(!tipoDeNumero.equals(auxiliar)){
+                                salvarArq.printf("Linha: %s - Variavel nao existe", linhaAtual);
+                            }
+                        }
                         state = 2;
                         break;
                     }
@@ -1539,7 +1618,8 @@ public class AnalisadorSintatico {
     public boolean expRelacional(int n) throws IOException {
         int state = n;
         Stack pilhaRelacional = new Stack();
-
+        String tipoDeNumero = null;
+        String auxiliar = null;
         while (true) {
             if (consumir()) {
                 return false;
@@ -1553,6 +1633,23 @@ public class AnalisadorSintatico {
                         break;
                     }
                     if (token.equals("Identificador")) {
+                        idAtual = lexema;
+                        if(variavelExiste()){
+                            auxiliar = tipoVariavel(idAtual);
+                            if(!auxiliar.equals("int") && !auxiliar.equals("float") && !auxiliar.equals("bool"))
+                                salvarArq.printf("Linha: %s - tipo de variavel nao compativel", linhaAtual);
+                            else{
+                                //verifica se ha tentativa de conversao implicita
+                                if(tipoDeNumero == null){
+                                    tipoDeNumero = auxiliar;
+                                }else{
+                                    if(!tipoDeNumero.equals(auxiliar)){
+                                        salvarArq.printf("Linha: %s - tentativa de conversao implicita", linhaAtual);
+                                    }
+                                }
+                            }
+                        }else
+                            salvarArq.printf("Linha: %s - Variavel nao existe", linhaAtual);
                         state = 1;
                         break;
                     } else if (token.equals("Número")) {
